@@ -1,0 +1,500 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ระบบจัดการร้านหมูกระทะแม่พร - สั่งอาหาร จัดคิว ออกใบเสร็จ">
+    <title>🔥 หมูกระทะแม่พร - ระบบจัดการร้าน</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ===== SIDEBAR NAV ===== -->
+    <nav id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">🔥</div>
+            <h1>แม่พร</h1>
+            <p>หมูกระทะ</p>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" data-view="dashboard" id="nav-dashboard">
+                <i class="fas fa-home"></i>
+                <span>หน้าหลัก</span>
+            </li>
+            <li class="nav-item" data-view="queue" id="nav-queue">
+                <i class="fas fa-users"></i>
+                <span>คิวลูกค้า</span>
+                <span class="badge" id="queue-badge">0</span>
+            </li>
+            <li class="nav-item" data-view="menu-manage" id="nav-menu-manage">
+                <i class="fas fa-utensils"></i>
+                <span>จัดการเมนู</span>
+            </li>
+            <li class="nav-item" data-view="history" id="nav-history">
+                <i class="fas fa-history"></i>
+                <span>ประวัติ</span>
+            </li>
+            <li class="nav-item" data-view="reports" id="nav-reports">
+                <i class="fas fa-chart-bar"></i>
+                <span>รายงาน</span>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="clock" id="sidebar-clock">00:00:00</div>
+            <div class="date" id="sidebar-date">วันที่</div>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main id="main-content">
+
+        <!-- ===== DASHBOARD VIEW ===== -->
+        <section id="view-dashboard" class="view active">
+            <div class="view-header">
+                <div>
+                    <h2><i class="fas fa-fire"></i> หน้าหลัก</h2>
+                    <p class="subtitle">ภาพรวมร้านหมูกระทะแม่พร</p>
+                </div>
+                <button class="btn btn-primary btn-glow" id="btn-new-order" onclick="showNewOrderModal()">
+                    <i class="fas fa-plus"></i> รับออเดอร์ใหม่
+                </button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card stat-orange">
+                    <div class="stat-icon"><i class="fas fa-fire-alt"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="stat-active">0</span>
+                        <span class="stat-label">โต๊ะกำลังทาน</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-green">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="stat-completed">0</span>
+                        <span class="stat-label">เสร็จแล้ววันนี้</span>
+                    </div>
+                </div>
+                <div class="stat-card stat-purple">
+                    <div class="stat-icon"><i class="fas fa-list-ol"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="stat-queue">0</span>
+                        <span class="stat-label">คิวทั้งหมด</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue Breakdown -->
+            <div class="section-header">
+                <h3><i class="fas fa-coins"></i> รายได้วันนี้</h3>
+            </div>
+            <div class="revenue-grid rv-5col">
+                <div class="revenue-card rv-walkin">
+                    <div class="rv-icon">🏪</div>
+                    <div class="rv-info">
+                        <span class="rv-label">ซื้อกลับบ้าน</span>
+                        <span class="rv-amount" id="rv-walkin">฿0</span>
+                    </div>
+                </div>
+                <div class="revenue-card rv-dinein">
+                    <div class="rv-icon">🍽️</div>
+                    <div class="rv-info">
+                        <span class="rv-label">กินในร้าน</span>
+                        <span class="rv-amount" id="rv-dinein">฿0</span>
+                    </div>
+                </div>
+                <div class="revenue-card rv-phone">
+                    <div class="rv-icon">📞</div>
+                    <div class="rv-info">
+                        <span class="rv-label">โทรสั่งมารับ</span>
+                        <span class="rv-amount" id="rv-phone">฿0</span>
+                    </div>
+                </div>
+                <div class="revenue-card rv-reserve">
+                    <div class="rv-icon">📅</div>
+                    <div class="rv-info">
+                        <span class="rv-label">โทรจองโต๊ะ</span>
+                        <span class="rv-amount" id="rv-reserve">฿0</span>
+                    </div>
+                </div>
+                <div class="revenue-card rv-total">
+                    <div class="rv-icon">💰</div>
+                    <div class="rv-info">
+                        <span class="rv-label">รวมทั้งหมด</span>
+                        <span class="rv-amount" id="rv-total">฿0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Banner -->
+            <div class="hero-banner">
+                <img src="mookata_hero.png" alt="หมูกระทะแม่พร">
+                <div class="hero-overlay">
+                    <h2>🔥 ร้านหมูกระทะแม่พร 🔥</h2>
+                    <p>หมูกระทะสุดอร่อย เนื้อสด ผักสด ราคาถูก!</p>
+                </div>
+            </div>
+
+            <!-- Table Map -->
+            <div class="section-header">
+                <h3><i class="fas fa-map-marker-alt"></i> แผนผังโต๊ะ</h3>
+            </div>
+            <div class="table-map-single" id="table-map">
+                <div class="table-grid-all" id="tables-all"></div>
+            </div>
+
+            <!-- Active Orders -->
+            <div class="section-header">
+                <h3><i class="fas fa-fire"></i> ออเดอร์ที่กำลังดำเนินการ</h3>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="order-filter-tabs" id="order-filter-tabs">
+                <div class="filter-tab active" data-filter="all" onclick="filterOrders(this,'all')">ทั้งหมด</div>
+                <div class="filter-tab" data-filter="walkin" onclick="filterOrders(this,'walkin')"><i class="fas fa-store"></i> ซื้อกลับบ้าน</div>
+                <div class="filter-tab" data-filter="dinein" onclick="filterOrders(this,'dinein')"><i class="fas fa-chair"></i> กินในร้าน</div>
+                <div class="filter-tab" data-filter="phone-pickup" onclick="filterOrders(this,'phone-pickup')"><i class="fas fa-phone"></i> โทรสั่งมารับ</div>
+                <div class="filter-tab" data-filter="phone-reserve" onclick="filterOrders(this,'phone-reserve')"><i class="fas fa-calendar-check"></i> โทรจองโต๊ะ</div>
+            </div>
+
+            <div class="orders-grid" id="active-orders-grid">
+                <div class="empty-state">
+                    <i class="fas fa-utensils"></i>
+                    <p>ยังไม่มีออเดอร์</p>
+                    <button class="btn btn-primary" onclick="showNewOrderModal()">เริ่มรับออเดอร์</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== QUEUE VIEW ===== -->
+        <section id="view-queue" class="view">
+            <div class="view-header">
+                <div>
+                    <h2><i class="fas fa-users"></i> คิวลูกค้า</h2>
+                    <p class="subtitle">จัดการคิวลูกค้าและออเดอร์</p>
+                </div>
+                <button class="btn btn-primary btn-glow" onclick="showNewOrderModal()">
+                    <i class="fas fa-plus"></i> เพิ่มคิวใหม่
+                </button>
+            </div>
+            <div class="queue-list" id="queue-list">
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <p>ยังไม่มีคิว</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== ORDER DETAIL VIEW ===== -->
+        <section id="view-order-detail" class="view">
+            <div class="view-header">
+                <div>
+                    <button class="btn btn-ghost" onclick="navigateTo('queue')">
+                        <i class="fas fa-arrow-left"></i> กลับ
+                    </button>
+                    <h2 id="order-detail-title">ออเดอร์</h2>
+                    <p class="subtitle" id="order-detail-subtitle"></p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" id="btn-add-items" onclick="showMenuModal()">
+                        <i class="fas fa-plus"></i> เพิ่มเมนู
+                    </button>
+                    <button class="btn btn-warning" id="btn-qr-pay" onclick="showQRPayment()">
+                        <i class="fas fa-qrcode"></i> QR ชำระเงิน
+                    </button>
+                    <button class="btn btn-primary" id="btn-receipt" onclick="showReceipt()">
+                        <i class="fas fa-receipt"></i> ใบเสร็จ
+                    </button>
+                    <button class="btn btn-danger" id="btn-cancel-order" onclick="cancelOrder()">
+                        <i class="fas fa-times"></i> ยกเลิก
+                    </button>
+                </div>
+            </div>
+            <div class="order-detail-content">
+                <div class="order-items-list" id="order-items-list"></div>
+                <div class="order-summary-panel" id="order-summary-panel"></div>
+            </div>
+        </section>
+
+        <!-- ===== MENU MANAGEMENT VIEW ===== -->
+        <section id="view-menu-manage" class="view">
+            <div class="view-header">
+                <div>
+                    <h2><i class="fas fa-utensils"></i> จัดการเมนู</h2>
+                    <p class="subtitle">เพิ่ม/แก้ไขเมนูอาหาร</p>
+                </div>
+                <button class="btn btn-primary" onclick="showAddMenuItemModal()">
+                    <i class="fas fa-plus"></i> เพิ่มเมนูใหม่
+                </button>
+            </div>
+            <div class="menu-categories" id="menu-categories-view"></div>
+        </section>
+
+        <!-- ===== HISTORY VIEW ===== -->
+        <section id="view-history" class="view">
+            <div class="view-header">
+                <div>
+                    <h2><i class="fas fa-history"></i> ประวัติออเดอร์</h2>
+                    <p class="subtitle">ออเดอร์ที่เสร็จสิ้นแล้ว</p>
+                </div>
+                <div class="header-actions">
+                    <div class="date-picker-wrap">
+                        <label><i class="fas fa-calendar-alt"></i> เลือกวัน:</label>
+                        <input type="date" id="history-date" onchange="renderHistory()">
+                    </div>
+                    <button class="btn btn-ghost" onclick="showAllHistory()"><i class="fas fa-list"></i> ดูทั้งหมด</button>
+                    <button class="btn btn-danger" onclick="clearHistory()">
+                        <i class="fas fa-trash"></i> ล้างประวัติ
+                    </button>
+                </div>
+            </div>
+            <div class="history-summary" id="history-summary"></div>
+            <div class="history-list" id="history-list">
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <p>ยังไม่มีประวัติ</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== REPORTS VIEW ===== -->
+        <section id="view-reports" class="view">
+            <div class="view-header">
+                <div>
+                    <h2><i class="fas fa-chart-bar"></i> รายงานสรุป</h2>
+                    <p class="subtitle">กราฟสรุปยอดขายรายวัน</p>
+                </div>
+                <div class="header-actions">
+                    <div class="date-picker-wrap">
+                        <label>จาก:</label>
+                        <input type="date" id="report-from">
+                    </div>
+                    <div class="date-picker-wrap">
+                        <label>ถึง:</label>
+                        <input type="date" id="report-to">
+                    </div>
+                    <button class="btn btn-primary" onclick="generateReport()"><i class="fas fa-sync"></i> แสดงกราฟ</button>
+                </div>
+            </div>
+            <div class="report-cards" id="report-cards"></div>
+            <div class="chart-container">
+                <h3 class="chart-title"><i class="fas fa-chart-line"></i> ยอดขายรายวัน</h3>
+                <canvas id="chart-daily-revenue"></canvas>
+            </div>
+            <div class="chart-row">
+                <div class="chart-container chart-half">
+                    <h3 class="chart-title"><i class="fas fa-chart-pie"></i> สัดส่วนประเภทออเดอร์</h3>
+                    <canvas id="chart-order-types"></canvas>
+                </div>
+                <div class="chart-container chart-half">
+                    <h3 class="chart-title"><i class="fas fa-chart-bar"></i> รายได้แยกโซน</h3>
+                    <canvas id="chart-zone-revenue"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- New Order Modal -->
+    <div class="modal-overlay" id="modal-new-order">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> รับออเดอร์ใหม่</h3>
+                <button class="modal-close" onclick="closeModal('modal-new-order')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>ประเภทออเดอร์</label>
+                    <div class="order-type-selector ot-4col" id="order-type-selector">
+                        <div class="ot-option active" data-type="walkin" onclick="selectOrderType(this)">
+                            <i class="fas fa-store"></i>
+                            <span>ซื้อกลับบ้าน</span>
+                        </div>
+                        <div class="ot-option" data-type="dinein" onclick="selectOrderType(this)">
+                            <i class="fas fa-chair"></i>
+                            <span>กินในร้าน</span>
+                        </div>
+                        <div class="ot-option" data-type="phone-pickup" onclick="selectOrderType(this)">
+                            <i class="fas fa-phone"></i>
+                            <span>โทรสั่งมารับ</span>
+                        </div>
+                        <div class="ot-option" data-type="phone-reserve" onclick="selectOrderType(this)">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>โทรจองโต๊ะ</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="customer-name">ชื่อลูกค้า</label>
+                    <input type="text" id="customer-name" placeholder="กรอกชื่อลูกค้า..." autofocus>
+                </div>
+                <div class="form-group" id="table-group">
+                    <label for="table-number">เลือกโต๊ะ</label>
+                    <select id="table-number">
+                        <option value="">-- ยังไม่เลือกโต๊ะ --</option>
+                        <optgroup label="🏠 โต๊ะในร้าน">
+                            <option value="1ใน">โต๊ะ 1 ใน</option>
+                            <option value="2ใน">โต๊ะ 2 ใน</option>
+                            <option value="3ใน">โต๊ะ 3 ใน</option>
+                            <option value="4ใน">โต๊ะ 4 ใน</option>
+                            <option value="5ใน">โต๊ะ 5 ใน</option>
+                            <option value="6ใน">โต๊ะ 6 ใน</option>
+                        </optgroup>
+                        <optgroup label="🌳 โต๊ะนอกร้าน">
+                            <option value="1นอก">โต๊ะ 1 นอก</option>
+                            <option value="2นอก">โต๊ะ 2 นอก</option>
+                            <option value="3นอก">โต๊ะ 3 นอก</option>
+                            <option value="4นอก">โต๊ะ 4 นอก</option>
+                            <option value="5นอก">โต๊ะ 5 นอก</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="form-group" id="guests-group">
+                    <label for="num-guests">จำนวนคน</label>
+                    <input type="number" id="num-guests" value="2" min="1" max="50">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-new-order')">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="createNewOrder()">
+                    <i class="fas fa-check"></i> สร้างออเดอร์
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Selection Modal -->
+    <div class="modal-overlay" id="modal-menu">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3><i class="fas fa-utensils"></i> เลือกเมนู</h3>
+                <button class="modal-close" onclick="closeModal('modal-menu')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="menu-tabs" id="menu-tabs"></div>
+                <div class="menu-grid" id="menu-grid"></div>
+            </div>
+            <div class="modal-footer">
+                <div class="cart-summary" id="cart-summary">
+                    <span>เลือกแล้ว: <strong id="cart-count">0</strong> รายการ</span>
+                    <span>รวม: <strong id="cart-total">฿0</strong></span>
+                </div>
+                <button class="btn btn-ghost" onclick="closeModal('modal-menu')">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="confirmMenuSelection()">
+                    <i class="fas fa-check"></i> เพิ่มลงออเดอร์
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Price Modal -->
+    <div class="modal-overlay" id="modal-custom-price">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3 id="custom-price-title">ใส่ราคา</h3>
+                <button class="modal-close" onclick="closeModal('modal-custom-price')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="custom-price-input">ราคา (บาท)</label>
+                    <input type="number" id="custom-price-input" placeholder="ใส่ราคา..." min="1">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-custom-price')">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="confirmCustomPrice()">
+                    <i class="fas fa-check"></i> ตกลง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Custom Menu Item Modal -->
+    <div class="modal-overlay" id="modal-add-menu">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> เพิ่มเมนูใหม่</h3>
+                <button class="modal-close" onclick="closeModal('modal-add-menu')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="new-menu-name">ชื่อเมนู</label>
+                    <input type="text" id="new-menu-name" placeholder="กรอกชื่อเมนู...">
+                </div>
+                <div class="form-group">
+                    <label for="new-menu-price">ราคา (บาท)</label>
+                    <input type="number" id="new-menu-price" placeholder="ราคา..." min="1">
+                </div>
+                <div class="form-group">
+                    <label for="new-menu-category">หมวดหมู่</label>
+                    <select id="new-menu-category">
+                        <option value="เมนูหลัก">เมนูหลัก</option>
+                        <option value="สั่งเพิ่ม">สั่งเพิ่ม</option>
+                        <option value="เครื่องดื่ม">เครื่องดื่ม</option>
+                        <option value="อื่นๆ" selected>อื่นๆ</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-add-menu')">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="addNewMenuItem()">
+                    <i class="fas fa-check"></i> เพิ่มเมนู
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Payment Modal -->
+    <div class="modal-overlay" id="modal-qr-payment">
+        <div class="modal modal-sm">
+            <div class="modal-header">
+                <h3><i class="fas fa-qrcode"></i> QR Code ชำระเงิน</h3>
+                <button class="modal-close" onclick="closeModal('modal-qr-payment')">&times;</button>
+            </div>
+            <div class="modal-body qr-body">
+                <div class="qr-amount" id="qr-amount">฿0</div>
+                <div class="form-group promptpay-field">
+                    <label for="promptpay-id">PromptPay ID</label>
+                    <input type="text" id="promptpay-id" placeholder="เบอร์มือถือ หรือเลขบัตรประชาชน" inputmode="numeric" oninput="renderPromptPayQRCode()">
+                </div>
+                <div class="qr-code-container" id="qr-code-container"></div>
+                <p class="qr-instruction">สแกน QR Code เพื่อชำระเงิน</p>
+                <button class="btn btn-success btn-block" onclick="markAsPaid()">
+                    <i class="fas fa-check-circle"></i> ยืนยันชำระเงินแล้ว
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div class="modal-overlay" id="modal-receipt">
+        <div class="modal modal-md">
+            <div class="modal-header">
+                <h3><i class="fas fa-receipt"></i> ใบเสร็จรับเงิน</h3>
+                <button class="modal-close" onclick="closeModal('modal-receipt')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="receipt" id="receipt-content"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-receipt')">ปิด</button>
+                <button class="btn btn-primary" onclick="printReceipt()">
+                    <i class="fas fa-print"></i> พิมพ์ใบเสร็จ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
