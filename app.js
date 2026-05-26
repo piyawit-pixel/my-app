@@ -1,13 +1,13 @@
 // ===== GOOGLE SHEETS INTEGRATION =====
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlm4-GNLc2YpNcESOSuzbras_vRr8r8w4fRBlsYILnfGXN0WW9fHNMt0g8l7gRZdg/exec";
 
-// ฟังก์ชันส่งข้อมูลจากเครื่องไปเซฟใน Google Sheet
+// ฟังก์ชันส่งข้อมูลจากเครื่องไปเซฟใน Google Sheet (แก้ไขให้ส่งตัวแปรตรงๆ ไม่บั๊ก)
 async function saveToGoogleSheet() {
     const payload = {
         action: 'saveAll',
-        orders: JSON.parse(localStorage.getItem('orders')) || [],
-        history: JSON.parse(localStorage.getItem('history')) || [],
-        menu: JSON.parse(localStorage.getItem('menu')) || MENU
+        orders: orders,       // ดึงจากตัวแปร orders ของระบบโดยตรง
+        history: history_,    // ดึงจากตัวแปร history_ ของระบบโดยตรง
+        menu: menuData        // ดึงจากตัวแปร menuData ของระบบโดยตรง
     };
     try {
         await fetch(SCRIPT_URL, {
@@ -20,7 +20,7 @@ async function saveToGoogleSheet() {
     }
 }
 
-// ฟังก์ชันดึงข้อมูลจาก Google Sheet มาอัปเดตในเครื่อง
+// ฟังก์ชันดึงข้อมูลจาก Google Sheet มาอัปเดตในเครื่อง (แก้ไขคีย์ให้ตรงกับระบบ)
 async function loadFromGoogleSheet() {
     try {
         const res = await fetch(SCRIPT_URL, {
@@ -29,7 +29,7 @@ async function loadFromGoogleSheet() {
         });
         const data = await res.json();
         
-        // เอาข้อมูลจาก Google Sheet มาใส่ใน localStorage และตัวแปรของแอป
+        // เอาข้อมูลจาก Google Sheet มาใส่ใน localStorage และตัวแปรระบบตามคีย์ที่ถูกต้อง
         if (data.menu && data.menu.length > 0) {
             localStorage.setItem('mookrata_menu', JSON.stringify(data.menu));
             menuData = data.menu;
