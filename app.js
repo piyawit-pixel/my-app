@@ -29,14 +29,24 @@ async function loadFromGoogleSheet() {
         });
         const data = await res.json();
         
-        // เอาข้อมูลจาก Google Sheet มาใส่ใน localStorage ของเครื่องนี้
-        localStorage.setItem('orders', JSON.stringify(data.orders || []));
-        localStorage.setItem('history', JSON.stringify(data.history || []));
-        localStorage.setItem('menu', JSON.stringify(data.menu || MENU));
+        // เอาข้อมูลจาก Google Sheet มาใส่ใน localStorage และตัวแปรของแอป
+        if (data.menu && data.menu.length > 0) {
+            localStorage.setItem('mookrata_menu', JSON.stringify(data.menu));
+            menuData = data.menu;
+        }
+        if (data.orders) {
+            localStorage.setItem('mookrata_orders', JSON.stringify(data.orders));
+            orders = data.orders;
+        }
+        if (data.history) {
+            localStorage.setItem('mookrata_history', JSON.stringify(data.history));
+            history_ = data.history;
+        }
         
-        // หลังจากโหลดข้อมูลมาแล้ว ต้องสั่งให้หน้าเว็บวาดหน้าจอใหม่
-        // ให้พิมพ์ชื่อฟังก์ชันที่ใช้วาดหน้าจอแอปของคุณต่อท้ายตรงนี้ เช่น renderOrders() หรือ init()
-        if (typeof render === 'function') render(); 
+        // สั่งให้หน้าเว็บวาดหน้าจอใหม่ด้วยข้อมูลล่าสุดที่ดึงมา
+        renderDashboard();
+        updateBadge();
+        
     } catch (e) {
         console.error('Error loading from Google Sheet:', e);
     }
@@ -117,6 +127,8 @@ function save() {
   localStorage.setItem('mookrata_orders', JSON.stringify(orders));
   localStorage.setItem('mookrata_history', JSON.stringify(history_));
   localStorage.setItem('mookrata_qc', queueCounter);
+  // 🌟 สั่งให้ส่งข้อมูลขึ้น Google Sheet ทันทีที่มีการบันทึกข้อมูลในแอป
+  saveToGoogleSheet();
 }
 
 function savePromptPayId(value) {
@@ -867,4 +879,6 @@ function drawZoneChart(orders){
 document.addEventListener('DOMContentLoaded', () => {
   renderDashboard();
   updateBadge();
+// 🌟 ดึงข้อมูลล่าสุดจาก Google Sheet ทันทีที่เปิดแอปหรือรีเฟรชหน้าเว็บ
+  loadFromGoogleSheet();
 });
