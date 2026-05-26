@@ -803,6 +803,16 @@ function clearHistory() {
   showToast('ล้างประวัติแล้ว','info');
 }
 
+// ฟังก์ชันรีเซ็ตคิวกลับไปที่เบอร์ 1
+function resetQueue() {
+  if (!confirm('ยืนยันการเริ่มคิวใหม่ (กลับไปที่คิวเบอร์ 1)?')) return;
+  
+  queueCounter = 1; // บังคับตัวนับคิวให้กลับไปเป็น 1
+  save(); // สั่งบันทึกและซิงค์ขึ้น Google Sheet
+  
+  showToast('รีเซ็ตคิวกลับไปเริ่มที่ 1 เรียบร้อยแล้ว', 'success');
+}
+
 // ===== REPORTS =====
 let chartD=null,chartT=null,chartZ=null;
 
