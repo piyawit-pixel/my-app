@@ -179,9 +179,14 @@
                     <h2><i class="fas fa-users"></i> คิวลูกค้า</h2>
                     <p class="subtitle">จัดการคิวลูกค้าและออเดอร์</p>
                 </div>
-                <button class="btn btn-primary btn-glow" onclick="showNewOrderModal()">
-                    <i class="fas fa-plus"></i> เพิ่มคิวใหม่
-                </button>
+                <div class="header-actions">
+                    <button class="btn btn-warning" onclick="resetQueue()">
+                        <i class="fas fa-redo"></i> เริ่มคิวที่ 1 ใหม่
+                    </button>
+                    <button class="btn btn-primary btn-glow" onclick="showNewOrderModal()">
+                        <i class="fas fa-plus"></i> เพิ่มคิวใหม่
+                    </button>
+                </div>
             </div>
             <div class="queue-list" id="queue-list">
                 <div class="empty-state">
