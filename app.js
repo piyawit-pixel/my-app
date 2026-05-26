@@ -1,4 +1,47 @@
-﻿// ===== DATA =====
+// ===== GOOGLE SHEETS INTEGRATION =====
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlm4-GNLc2YpNcESOSuzbras_vRr8r8w4fRBlsYILnfGXN0WW9fHNMt0g8l7gRZdg/exec";
+
+// ฟังก์ชันส่งข้อมูลจากเครื่องไปเซฟใน Google Sheet
+async function saveToGoogleSheet() {
+    const payload = {
+        action: 'saveAll',
+        orders: JSON.parse(localStorage.getItem('orders')) || [],
+        history: JSON.parse(localStorage.getItem('history')) || [],
+        menu: JSON.parse(localStorage.getItem('menu')) || MENU
+    };
+    try {
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        console.log('Saved to Google Sheet successfully');
+    } catch (e) {
+        console.error('Error saving to Google Sheet:', e);
+    }
+}
+
+// ฟังก์ชันดึงข้อมูลจาก Google Sheet มาอัปเดตในเครื่อง
+async function loadFromGoogleSheet() {
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'loadAll' })
+        });
+        const data = await res.json();
+        
+        // เอาข้อมูลจาก Google Sheet มาใส่ใน localStorage ของเครื่องนี้
+        localStorage.setItem('orders', JSON.stringify(data.orders || []));
+        localStorage.setItem('history', JSON.stringify(data.history || []));
+        localStorage.setItem('menu', JSON.stringify(data.menu || MENU));
+        
+        // หลังจากโหลดข้อมูลมาแล้ว ต้องสั่งให้หน้าเว็บวาดหน้าจอใหม่
+        // ให้พิมพ์ชื่อฟังก์ชันที่ใช้วาดหน้าจอแอปของคุณต่อท้ายตรงนี้ เช่น renderOrders() หรือ init()
+        if (typeof render === 'function') render(); 
+    } catch (e) {
+        console.error('Error loading from Google Sheet:', e);
+    }
+}
+// ===== DATA =====
 const MENU = [
   {id:1,name:'หมูกระทะชุดใหญ่',price:250,cat:'เมนูหลัก',icon:'🍖',img:'mookata_hero.png'},
   {id:2,name:'หมูกระทะชุดจัมโบ้',price:300,cat:'เมนูหลัก',icon:'🔥',img:'mookata_hero.png'},
